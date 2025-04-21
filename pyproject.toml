@@ -1,0 +1,46 @@
+[project]
+name = "ansible-multipass"
+version = "0.1.0"
+description = "An Ansible collection for managing Multipass VMs"
+authors = [
+    { name = "Hamish", email = "your@email.com" }
+]
+readme = "README.md"
+requires-python = ">=3.9"
+
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.black]
+line-length = 88
+target-version = ["py39"]
+
+[tool.isort]
+profile = "black"
+
+[tool.mypy]
+python_version = 3.9
+strict = true
+ignore_missing_imports = true
+
+[tool.pylint.'MESSAGES CONTROL']
+disable = [
+    "missing-module-docstring",
+    "missing-function-docstring",
+    "too-few-public-methods",
+    "invalid-name"
+]
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-ra -q"
+testpaths = ["tests"]
+
+[tool.coverage.run]
+branch = true
+source = ["hlsm/multipass/module_utils/multipass"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
