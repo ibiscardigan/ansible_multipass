@@ -9,7 +9,7 @@ import tempfile
 import uuid
 import pytest
 
-from hlsm.multipass.module_utils import core, types
+from plugins.module_utils import core, types
 
 
 def generate_unique_vm_name(prefix: str = "itest") -> str:

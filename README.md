@@ -1,2 +1,3 @@
-# ansible_multipass
-ansible module to manage the multipass interface
+# Ansible Collection - hlsm.multipass
+
+Documentation for the collection.

@@ -1,7 +1,7 @@
 """Unit tests for multipass core logic."""
 
 import pytest
-from hlsm.multipass.module_utils import core, cli, types
+from plugins.module_utils import core, cli, types
 
 
 class DummyModule:

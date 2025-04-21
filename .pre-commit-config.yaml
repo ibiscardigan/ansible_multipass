@@ -28,12 +28,21 @@ repos:
         types: [python]
         require_serial: true
         additional_dependencies: ["pylint", "pytest"]
+        exclude: ^plugins/modules/
+
+      - id: pylint
+        name: pylint-modules
+        entry: bash -c 'PYTHONPATH=. pylint --rcfile=plugins/modules/.pylintrc plugins/modules'
+        language: python
+        types: [python]
+        require_serial: true
+        additional_dependencies: ["pylint", "pytest"]
 
   - repo: local
     hooks:
       - id: pytest
         name: pytest with coverage
-        entry: bash -c 'PYTHONPATH=. pytest --cov=hlsm --cov-report=term-missing'
+        entry: bash -c 'PYTHONPATH=. pytest --cov=plugins --cov-report=term-missing'
         language: system
         types: [python]
         pass_filenames: false

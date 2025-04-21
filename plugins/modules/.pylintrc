@@ -1,0 +1,21 @@
+[MASTER]
+# Avoid false import errors for Ansible modules like `ansible.module_utils.basic`
+init-hook='import sys; from pathlib import Path; sys.path.append(str(Path.cwd() / "plugins" / "module_utils"))'
+
+[MESSAGES CONTROL]
+# Only disable import-error for this directory
+disable=import-error
+
+[FORMAT]
+max-line-length=120
+
+[TYPECHECK]
+# Pylint may still try to type-check ansible.module_utils -- disable this to reduce noise
+ignored-modules=ansible.module_utils.basic
+
+[REPORTS]
+output-format=colorized
+
+[DESIGN]
+max-args=6
+max-branches=12

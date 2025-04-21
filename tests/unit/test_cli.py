@@ -2,7 +2,7 @@
 
 import subprocess
 import pytest
-from hlsm.multipass.module_utils import cli, types
+from plugins.module_utils import cli, types
 
 
 def test_run_command_success(monkeypatch):
