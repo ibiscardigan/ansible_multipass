@@ -1,6 +1,5 @@
 [project]
 name = "ansible-multipass"
-version = "0.1.0"
 description = "An Ansible collection for managing Multipass VMs"
 authors = [
     { name = "HLSM", email = "lateral_songs_1a@icloud.com" }
