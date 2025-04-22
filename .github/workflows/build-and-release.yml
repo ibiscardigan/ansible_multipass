@@ -60,12 +60,12 @@ jobs:
           ansible-galaxy collection build --output-path dist
           echo "TARFILE=$(ls dist/*.tar.gz)" >> $GITHUB_ENV
 
-      - name: Create GitHub release
+      - name: Upload built collection to release
         if: steps.check_tag.outputs.tag_exists == 'false'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ steps.extract_version.outputs.version }}
           name: Release v${{ steps.extract_version.outputs.version }}
-          files: ${{ env.TARFILE }}
+          files: ibiscardigan/multipass/dist/ibiscardigan-multipass-${{ steps.extract_version.outputs.version }}.tar.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
