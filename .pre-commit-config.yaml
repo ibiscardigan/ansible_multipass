@@ -22,13 +22,13 @@ repos:
   - repo: local
     hooks:
       - id: pylint
-        name: pylint
-        entry: bash -c 'PYTHONPATH=ibiscardigan/multipass pylint --rcfile=ibiscardigan/multipass/pyproject.toml "$@"'
+        name: pylint-collection
+        entry: pylint
         language: python
         types: [python]
-        require_serial: true
-        additional_dependencies: ["pylint", "pytest"]
-        exclude: ^(ibiscardigan/multipass/plugins/modules/)
+        additional_dependencies: ["pylint"]
+        args: ["--rcfile=ibiscardigan/multipass/pyproject.toml"]
+        exclude: ^ibiscardigan/multipass/plugins/modules/
 
       - id: pylint-modules
         name: pylint-modules

@@ -1,5 +1,6 @@
 """CLI wrapper for calling the multipass command safely."""
 
+import os
 import subprocess
 import json
 from typing import TYPE_CHECKING
@@ -37,6 +38,8 @@ def run_multipass_command(
     _log_debug(module, f"Executing: {' '.join(base_cmd)}")
 
     try:
+        env = os.environ.copy()
+        env["PATH"] = env.get("PATH", "") + ":/opt/homebrew/bin:/usr/local/bin"
         result = subprocess.run(
             base_cmd,
             capture_output=capture_output,
