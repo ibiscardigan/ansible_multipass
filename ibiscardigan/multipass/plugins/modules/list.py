@@ -1,7 +1,7 @@
 """Ansible module for listing Multipass instances."""
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils import core, types  # pylint: disable=import-error
+from ansible_collections.ibiscardigan.multipass.plugins.module_utils import core, types  # pylint: disable=import-error
 
 
 def main():
