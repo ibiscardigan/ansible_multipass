@@ -37,7 +37,7 @@ jobs:
             echo "tag_exists=false" >> $GITHUB_OUTPUT
           fi
 
-      - name: Create tag
+      - name: Create tag and push
         if: steps.check_tag.outputs.tag_exists == 'false'
         env:
           GH_PAT: ${{ secrets.RELEASE_PAT }}
@@ -46,6 +46,7 @@ jobs:
           git config user.email "github-actions@github.com"
           VERSION=${{ steps.extract_version.outputs.version }}
           git tag "v$VERSION"
+          git remote set-url origin https://x-access-token:${GH_PAT}@github.com/${{ github.repository }}
           git push origin "v$VERSION"
 
       - name: Build collection
