@@ -23,16 +23,16 @@ repos:
     hooks:
       - id: pylint
         name: pylint
-        entry: bash -c 'PYTHONPATH=. pylint --rcfile=pyproject.toml "$@"'
+        entry: bash -c 'PYTHONPATH=ibiscardigan/multipass pylint --rcfile=ibiscardigan/multipass/pyproject.toml "$@"'
         language: python
         types: [python]
         require_serial: true
         additional_dependencies: ["pylint", "pytest"]
-        exclude: ^plugins/modules/
+        exclude: ^(ibiscardigan/multipass/plugins/modules/)
 
-      - id: pylint
+      - id: pylint-modules
         name: pylint-modules
-        entry: bash -c 'PYTHONPATH=. pylint --rcfile=plugins/modules/.pylintrc plugins/modules'
+        entry: bash -c 'PYTHONPATH=ibiscardigan/multipass pylint --rcfile=ibiscardigan/multipass/plugins/modules/.pylintrc ibiscardigan/multipass/plugins/modules'
         language: python
         types: [python]
         require_serial: true
@@ -42,7 +42,7 @@ repos:
     hooks:
       - id: pytest
         name: pytest with coverage
-        entry: bash -c 'PYTHONPATH=. pytest --cov=plugins --cov-report=term-missing'
+        entry: bash -c 'PYTHONPATH=ibiscardigan/multipass pytest --cov=ibiscardigan/multipass/plugins --cov-report=term-missing'
         language: system
         types: [python]
         pass_filenames: false

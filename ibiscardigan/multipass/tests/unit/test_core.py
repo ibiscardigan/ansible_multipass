@@ -1,27 +1,20 @@
-"""Unit tests for multipass core logic."""
+"""Unit tests for core VM lifecycle logic."""
 
 import pytest
-from plugins.module_utils import core, cli, types
+from tests.helpers import helpers
+from plugins.module_utils import cli, core, types
 
 
-class DummyModule:
-    """Mock AnsibleModule for capturing logs during CLI calls."""
-
-    def __init__(self):
-        self.logs = []
-
-    def log(self, msg):
-        """Capture log message into internal log list."""
-        self.logs.append(msg)
+def raise_not_found_error(*_args, **_kwargs):
+    """Returns a cli error for host not found"""
+    raise types.MultipassCLIError("Instance does not exist")
 
 
 def test_get_info_returns_vm_details(monkeypatch):
     """get_info() should return the VM info dict when instance exists."""
 
     def mock_run(*_args, **_kwargs):
-        return {
-            "json": {"info": {"myvm": {"state": "Running", "ipv4": ["192.168.64.2"]}}}
-        }
+        return {"json": {"info": {"myvm": {"state": "Running", "ipv4": ["192.168.64.2"]}}}}
 
     monkeypatch.setattr(cli, "run_multipass_command", mock_run)
     result = core.get_info("myvm")
@@ -30,40 +23,22 @@ def test_get_info_returns_vm_details(monkeypatch):
 
 def test_get_info_returns_none_for_missing_instance(monkeypatch):
     """get_info() should return None if instance is not found."""
-
-    def mock_run(*_args, **_kwargs):
-        raise types.MultipassCLIError("Instance does not exist")
-
-    monkeypatch.setattr(cli, "run_multipass_command", mock_run)
+    monkeypatch.setattr(cli, "run_multipass_command", raise_not_found_error)
     assert core.get_info("ghost") is None
-
-
-def raise_cli_error(*_args, **_kwargs):
-    """Raise MultipassCLIError to simulate CLI failure."""
-    raise types.MultipassCLIError("fail")
 
 
 def test_get_info_raises_on_other_error(monkeypatch):
     """get_info() should raise on unexpected CLI error."""
-
-    monkeypatch.setattr(cli, "run_multipass_command", raise_cli_error)
+    monkeypatch.setattr(cli, "run_multipass_command", helpers.raise_cli_error)
     with pytest.raises(types.MultipassCLIError):
         core.get_info("boom")
 
 
 def test_ensure_present_creates_minimal(monkeypatch):
     """ensure_present() launches a VM when it doesn't exist."""
-    dummy = DummyModule()
-    call_count = {"count": 0}
-
-    def mock_get_info(_args, **_kwargs):
-        if call_count["count"] == 0:
-            call_count["count"] += 1
-            return None
-        return {"state": "Running"}
-
-    monkeypatch.setattr(core, "get_info", mock_get_info)
-    monkeypatch.setattr(cli, "run_multipass_command", lambda *_a, **_kw: {"rc": 0})
+    dummy = helpers.DummyModule()
+    monkeypatch.setattr(core, "get_info", helpers.generate_toggle_mock_get_info())
+    monkeypatch.setattr(cli, "run_multipass_command", helpers.mock_success_command)
 
     config = types.VMConfig(name="vm1", image="20.04")
     result = core.ensure_present(config, module=dummy)
@@ -75,7 +50,6 @@ def test_ensure_present_creates_minimal(monkeypatch):
 def test_ensure_present_returns_if_already_exists(monkeypatch):
     """ensure_present() should not recreate existing VM."""
     monkeypatch.setattr(core, "get_info", lambda *_a, **_kw: {"state": "Running"})
-
     config = types.VMConfig(name="vm1", image="20.04")
     result = core.ensure_present(config)
     assert result["changed"] is False
@@ -91,7 +65,7 @@ def test_ensure_absent_when_vm_is_missing(monkeypatch):
 
 def test_ensure_absent_deletes_existing_vm(monkeypatch):
     """ensure_absent() should delete VM and return changed=True."""
-    dummy = DummyModule()
+    dummy = helpers.DummyModule()
     deleted = []
 
     monkeypatch.setattr(core, "get_info", lambda *_a, **_kw: {"state": "Running"})
@@ -109,7 +83,7 @@ def test_ensure_absent_deletes_existing_vm(monkeypatch):
 
 
 def test_list_instances_happy(monkeypatch):
-    """list_instances returns a list of VMs on success."""
+    """list_instances returns a dict of VMs on success."""
 
     def mock_run_multipass_command(*_args, **_kwargs):
         return {
@@ -122,7 +96,6 @@ def test_list_instances_happy(monkeypatch):
         }
 
     monkeypatch.setattr(cli, "run_multipass_command", mock_run_multipass_command)
-
     result = core.list_instances()
     assert isinstance(result, dict)
     assert "vm1" in result
@@ -134,19 +107,12 @@ def test_list_instances_happy(monkeypatch):
 
 def test_list_instances_no_info_key(monkeypatch):
     """list_instances returns empty dict if 'info' key is missing."""
-
-    def mock_run_multipass_command(*_args, **_kwargs):
-        return {"json": {}}
-
-    monkeypatch.setattr(cli, "run_multipass_command", mock_run_multipass_command)
-
+    monkeypatch.setattr(cli, "run_multipass_command", lambda *_a, **_kw: {"json": {}})
     assert core.list_instances() == {}
 
 
 def test_list_instances_command_fails(monkeypatch):
     """list_instances raises MultipassCLIError on failure."""
-
-    monkeypatch.setattr(cli, "run_multipass_command", raise_cli_error)
-
+    monkeypatch.setattr(cli, "run_multipass_command", helpers.raise_cli_error)
     with pytest.raises(types.MultipassCLIError):
         core.list_instances()

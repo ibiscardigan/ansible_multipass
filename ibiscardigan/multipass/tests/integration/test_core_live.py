@@ -26,9 +26,7 @@ def live_vm():
         A VMConfig instance used to create the VM.
     """
     vm_name = generate_unique_vm_name()
-    config = types.VMConfig(
-        name=vm_name, image="20.04", cpus=1, memory="512M", disk="4G"
-    )
+    config = types.VMConfig(name=vm_name, image="20.04", cpus=1, memory="512M", disk="4G")
 
     # Ensure the VM is initially absent
     assert core.get_info(vm_name) is None
@@ -81,9 +79,7 @@ def test_ensure_present_applies_cloud_init():
     """Integration test: ensure cloud-init file is respected and executed."""
 
     vm_name = f"itest-cloud-{uuid.uuid4().hex[:8]}"
-    cloud_init_content = (
-        "#cloud-config\nruncmd:\n  - echo 'cloud-init OK' > /home/ubuntu/test.txt"
-    )
+    cloud_init_content = "#cloud-config\nruncmd:\n  - echo 'cloud-init OK' > /home/ubuntu/test.txt"
 
     with tempfile.NamedTemporaryFile(mode="w", delete=False) as tmp:
         tmp.write(cloud_init_content)
