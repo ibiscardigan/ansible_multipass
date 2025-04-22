@@ -36,7 +36,7 @@ jobs:
         id: check_tag
         run: |
           VERSION=${{ steps.extract_version.outputs.version }}
-          if git rev-parse "v$VERSION" >/dev/null 2>&1; then
+          if git ls-remote --tags origin | grep "refs/tags/v$VERSION$" >/dev/null; then
             echo "tag_exists=true" >> $GITHUB_OUTPUT
           else
             echo "tag_exists=false" >> $GITHUB_OUTPUT
